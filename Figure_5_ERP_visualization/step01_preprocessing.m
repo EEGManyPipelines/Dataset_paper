@@ -22,6 +22,7 @@ cfg.epoch_lims     = [-0.5  1.0];
 
 %% Preprocessing.
 subjects = dir([cfg.dir_eeg_in '*.set']);
+if ~exist(cfg.dir_eeg_out), mkdir(cfg.dir_eeg_out); end
 
 parfor (isub = 1:length(subjects), 6)  
 
