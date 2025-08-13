@@ -9,9 +9,9 @@
 addpath('../toolboxes/eeglab2021.0/');
 addpath('./subfuncs/')
 eeglab nogui; clear; close all; clc
-
+ 
 %% Set configuration.
-cfg.dir_eeg_in     = '../curate_EEG_data/OUT/eeg_eeglab/';
+cfg.dir_eeg_in     = '../../curate_EEG_data/OUT/eeg_eeglab/';
 cfg.dir_eeg_out    = './data/';
 cfg.overwrite_prep = true;
 
