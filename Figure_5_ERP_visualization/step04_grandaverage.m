@@ -6,7 +6,7 @@
 
 %% Silently load EEGLAB once to load all necessary paths. 
 % Then wipe all the unnessesary variables.
-addpath('../toolboxes/eeglab2021.0/');
+addpath('X:\aebusch\nbusch\projects\EEG-Many-Pipelines\toolboxes\eeglab2021.0\');
 addpath('./subfuncs/')
 eeglab nogui; clear; close all; clc
 
@@ -51,26 +51,17 @@ for isub = 1:length(subjects)
     % Extract trials for each condition.
     for icond = 1:size(grand.conditions,1)
         for ilevel = 1:2
-            field  = grand.conditions{icond,ilevel}{1};     % e.g., 'old' or 'behavior'
-            value  = grand.conditions{icond,ilevel}{2};     % e.g., 'old' or 'hit'
-            trials = strcmp({EEG.event.(field)}, value);    % <-- note the curly braces
+            field  = grand.conditions{icond,ilevel}{1};     
+            value  = grand.conditions{icond,ilevel}{2};     
+            trials = strcmp([EEG.event.(field)], value);   
 
             % trials = strcmp([EEG.event.(grand.conditions{icond,ilevel}{1})], grand.conditions{icond,ilevel}{2});
             grand.data(:, :, isub, icond, ilevel) = mean(EEG.data(:,:,trials),3);
         end
     end
 
-    is_old = strcmp({EEG.event.old}, 'old');
-    is_hit = strcmp({EEG.event.behavior}, 'hit');
-    grand.hit_rate(isub) = sum(is_hit & is_old) / sum(is_old);
-
-    is_new = strcmp({EEG.event.old}, 'new');
-    is_fa  = strcmp({EEG.event.behavior}, 'fa');   % or 'false_alarm' depending on your coding
-    grand.fal_rate(isub)  = sum(is_fa & is_new) / sum(is_new);
-
-
-    % grand.hit_rate(isub) = sum(strcmp([EEG.event.behavior], 'hit'))        / sum(strcmp([EEG.event.old], 'old'));
-    % grand.fal_rate(isub) = sum(strcmp([EEG.event.behavior], 'falsealarm')) / sum(strcmp([EEG.event.old], 'new'));
+    grand.hit_rate(isub) = sum(strcmp([EEG.event.behavior], 'hit'))        / sum(strcmp([EEG.event.old], 'old'));
+    grand.fal_rate(isub) = sum(strcmp([EEG.event.behavior], 'falsealarm')) / sum(strcmp([EEG.event.old], 'new'));
     grand.dprime(isub)   = norminv(grand.hit_rate(isub)) - norminv(grand.fal_rate(isub));
 end
 

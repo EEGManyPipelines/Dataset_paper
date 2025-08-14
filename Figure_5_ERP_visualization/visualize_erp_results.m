@@ -5,7 +5,7 @@
 
 %% Silently load EEGLAB once to load all necessary paths. 
 % Then wipe all the unnessesary variables.
-addpath('../toolboxes/eeglab2021.0/');
+addpath('X:\aebusch\nbusch\projects\EEG-Many-Pipelines\toolboxes\eeglab2021.0\');
 addpath('./subfuncs/')
 eeglab nogui; clear; close all
 
@@ -103,10 +103,10 @@ end
 
 set(fighand,'units','normalized','position',[0.1,0.1,0.8,0.8])
 
+if ~exist('./figures'), mkdir('./figures'); end
+
 out = fullfile('./figures','figure5');
 
 if ~exist('./figures','dir'), mkdir figures; end
 print(gcf, [out '.png'], '-dpng', '-r300');
-print(gcf, [out '.pdf'], '-dpdf');
-savefig([out '.fig']);
 disp('Done.')
