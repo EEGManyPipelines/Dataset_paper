@@ -17,4 +17,10 @@
 % intended for scientific inference and should not be interpreted as
 % "ground truth" or as the "desired outcome" of the analysis.
 %
+% You can run the final script visualize_erp_results.m to reproduce Figure 5
+% without going through the preceding processing steps, using the 
+% grandaverage.mat file provided here. Note: you still need your own local
+% instance of the EEGLAB toolbox.
+%
 % 2025-08-13, Niko Busch.
+
