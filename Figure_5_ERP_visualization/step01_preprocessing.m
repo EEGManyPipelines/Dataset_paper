@@ -19,7 +19,7 @@ cfg.resample_freq  = 256;
 cfg.hp_filt_cutoff = 0.1;
 cfg.lp_filt_cutoff = 40;
 cfg.epoch_lims     = [-0.5  1.0];
-
+ 
 %% Preprocessing.
 subjects = dir([cfg.dir_eeg_in '*.set']);
 if ~exist(cfg.dir_eeg_out), mkdir(cfg.dir_eeg_out); end
