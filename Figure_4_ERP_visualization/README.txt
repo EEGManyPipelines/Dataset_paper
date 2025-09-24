@@ -1,4 +1,4 @@
-% This code reproduces Figure 5 from the EEGManyPipelines data descriptor
+% This code reproduces Figure 4 from the EEGManyPipelines data descriptor
 % paper: https://github.com/EEGManyPipelines
 %
 % The analysis presented here was conducted solely as a sanity check for
