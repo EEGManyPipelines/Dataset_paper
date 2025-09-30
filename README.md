@@ -5,8 +5,8 @@ EEGManyPipelines is a many-analyst study aiming to examine how differences in el
 ## Folder structure
 The folders contain R code used to generate plots for the Data Descriptor paper and MATLAB code used to curate the EEG time-series data for the analyses reported in the manuscript presenting the main findings of the project. A more detailed description of the dataset is provided in our Data Descriptor paper (link to be added once the paper is published online).
 
-### Figure_4_ERP_visualization folder
-The folder "Figure_4_ERP_visualization" contains MATLAB code used to confirm data integrity and verify that the dataset contained all necessary information for analysis. The EEGManyPipelines steering committee members conducted an ERP analysis following the same instructions given to the analysts. These results were not available to analysts. Specifically, GA ERPs of man-made scenes were compared to natural scenes, old with new items, hits with misses, and subsequently remembered with forgotten items. No statistical tests were carried out on these data. 
+### Figure_4_ERP_visualization_and_data_integrity folder
+The folder "Figure_4_ERP_visualization_and_data_integrity" contains MATLAB code used to confirm data integrity and verify that the dataset contained all necessary information for analysis. The EEGManyPipelines steering committee members conducted an ERP analysis following the same instructions given to the analysts. These results were not available to analysts. Specifically, GA ERPs of man-made scenes were compared to natural scenes, old with new items, hits with misses, and subsequently remembered with forgotten items. No statistical tests were carried out on these data. 
 
 ### Curated data folder
 To facilitate data analysis across multiple teams, we curated the epoched EEG data (which was already transformed into .mat files) into a common format, matching the data files in terms of their sampling rate (250 Hz), epoch length (from -200 to 600 ms relative to image onset), and number and order of channels.
