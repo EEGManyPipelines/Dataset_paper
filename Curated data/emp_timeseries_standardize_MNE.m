@@ -73,9 +73,7 @@ fprintf('*** Found %d files:\n%s ***\n', nTeam, strjoin(teamList, ', '));
 
 for iTeam = 1:nTeam %
 
-
     alldatstand = cell(1,nTeam)
-    alldatavg = cell(1,nTeam)
 
     fprintf('*** ========================================================== ***\n');
     fprintf('*** TEAM %s: Start loading data ...  ***\n', teamList{iTeam});
@@ -125,7 +123,7 @@ for iTeam = 1:nTeam %
             rawData.data = rawData.data(indx_chan,:,:);
 
         else
-            error('Elena: isnpect dimentions')
+            error('Insnpect dimentions')
         end
 
         % --------------------------------------------------------------- %
@@ -206,23 +204,16 @@ for iTeam = 1:nTeam %
         chan_full(indx_mchan) = data4.label(pl_mchan(find(pl_mchan))); % include labels of existing channels
 
         for p = 1:length(data4.trial)% re-order trials according to eegChanVec
-            test = data4;
-            test.trial{p} = test.trial{p}(pl_mchan(find(pl_mchan)),:); %re-order time series data based on a standard channel order
+            copy_data4 = data4;
+            copy_data4.trial{p} = copy_data4.trial{p}(pl_mchan(find(pl_mchan)),:); %re-order time series data based on a standard channel order
             trial_templ = nan(length(eegChanVec),length(data4.time{p}));
-            trial_templ(indx_mchan,:) = test.trial{p}; % include re-ordered data and NaN are kept for missing channels
+            trial_templ(indx_mchan,:) = copy_data4.trial{p}; % include re-ordered data and NaN are kept for missing channels
             data4.trial(p) = {trial_templ};
         end
 
         data4.label = eegChanVec;
         % Store time info for a report txt file
         time =data4.time{1,1};
-
-        % --------------------------------------------------------------- %
-        %% Compute summary statistic (mean, variance, dof) across trials:
-
-        fprintf('*** Subject %02d: Compute summary statistics across trials ***\n', iSub);
-        cfg                     = [];
-        data5                   = ft_timelockanalysis(cfg, data4);
 
         % --------------------------------------------------------------- %
         %% Save chan x time matrix in teams x subjects cell:
@@ -234,19 +225,15 @@ for iTeam = 1:nTeam %
         alldatstand{1,subID} = data4;
         alldatstand{2,subID} = ['Subj-',num2str(subID)];
 
-        alldatavg{1,subID} = data5;
-        alldatavg{2,subID} = ['Subj-',num2str(subID)];
-
 
         fprintf('*** Subject %02d: FINISHED ***\n', iSub);
-        clear data1 data3 data4 data5  timeIdx cfg timeVecNew timeVecFound  nTimeFound nTrialFound rawData
+        clear data1 data3 data4   timeIdx cfg timeVecNew timeVecFound  nTimeFound nTrialFound rawData
 
     end % end iSub
     fprintf('*** TEAM %s: FINISHED  ***\n', teamList{iTeam});
 
     %save
     save([dirs.saveDirstand,'standart_',extractBefore(teamList{iTeam},'_')], 'alldatstand','-v7.3')
-    save([dirs.saveDiravg,'sbjavg_',extractBefore(teamList{iTeam},'_')], 'alldatavg','-v7.3')
 
     %create a report
 %     fileID = fopen([dirs.saveDirstand, 'standartization_report.txt'],'a+');

@@ -86,10 +86,6 @@ for iTeam = 1:nTeam
 
     alldatstand = cell(1,nSub);
 
-    if endsWith(teamList{iTeam}, '_2.mat')
-        continue
-    end
-
     % Load data:
     fprintf('*** ========================================================== ***\n');
     fprintf('*** TEAM %s: Start loading data ...  ***\n', teamList{iTeam});
@@ -145,12 +141,12 @@ for iTeam = 1:nTeam
         if size(rawData(iSub).EEGts,1) <=74 % first dimention should be channels
             rawData(iSub).EEGts = rawData(iSub).EEGts(indx_chan,:,:);
         else
-            %error('Inspect dimentions')
-            rawData(iSub).EEGts = permute(rawData(iSub).EEGts,[2 1 3]);
-            rawData(iSub).EEGts = rawData(iSub).EEGts(indx_chan,:,:);
-             nChanFound          = size(rawData(iSub).EEGts, 1);
-            nTimeFound          = size(rawData(iSub).EEGts, 2);
-            nTrialFound         = size(rawData(iSub).EEGts, 3);
+            error('Inspect dimentions')
+%             rawData(iSub).EEGts = permute(rawData(iSub).EEGts,[2 1 3]);
+%             rawData(iSub).EEGts = rawData(iSub).EEGts(indx_chan,:,:);
+%              nChanFound          = size(rawData(iSub).EEGts, 1);
+%             nTimeFound          = size(rawData(iSub).EEGts, 2);
+%             nTrialFound         = size(rawData(iSub).EEGts, 3);
 
         end
 
@@ -245,135 +241,6 @@ for iTeam = 1:nTeam
 
     end % end iSub
     fprintf('*** TEAM %s: FINISHED  ***\n', teamList{iTeam});
-
-    %% A special case - when a single team has more than 1 file -combine them and skip the  second file
-    if endsWith(teamList{iTeam}, '_1.mat')
-        clear rawData data4
-        rawData         = load(fullfile(dirs.data, [extractBefore(teamList{iTeam}, '_1'),'_2.mat']));
-        rawData         = rawData.data;
-        nSubFound       = sum(~cellfun(@isempty,{rawData.subID}));
-        indx_sub = find(~cellfun(@isempty,{rawData.subID}));
-
-        % Loop over found subjects:
-        for iSub = 1:nSubFound % iSub = 1;
-            iSub = indx_sub(iSub)
-            fprintf('*** --------------------------------------------- ***\n');
-            fprintf('*** Subject %02d: START ***\n', iSub);
-
-            % Extract data dimensions:
-            nChanFound = []
-            nChanFound          = size(rawData(iSub).EEGts, 1);
-            nTimeFound          = size(rawData(iSub).EEGts, 2);
-            nTrialFound         = size(rawData(iSub).EEGts, 3);
-            fprintf('*** Subject %02d: Found data from %d channels, %d time points, %d trials ***\n', ...
-                iSub, nChanFound, nTimeFound, nTrialFound);
-
-            %% Keep only the selected channels
-            indx_chan = [];
-            if isequal(teamList{iTeam}, 'f5e788cb73eec086.mat')
-                rawData(iSub).chan = {rawData(iSub).chan.labels};
-            end
-            indx_chan = ismember(rawData(iSub).chan, eegChanVec);
-            rawData(iSub).chan = rawData(iSub).chan(indx_chan);
-
-            if size(rawData(iSub).EEGts,1) <=74 % first dimention should be channels
-                rawData(iSub).EEGts = rawData(iSub).EEGts(indx_chan,:,:);
-            else
-                error('Inspect dimentions')
-            end
-            % --------------------------------------------------------------- %
-            %% Create Fieldtrip structure:
-            % Check if data exists (or subject excluded), if not, then skip:
-            if isempty(rawData(iSub).EEGts)
-                fprintf('*** Subject %02d: Data is empty, skip subject ***\n', iSub);
-                continue
-            else
-                fprintf('*** Subject %02d: Cast into Fieldtrip structure ***\n', iSub);
-                data1                   = []; % initialize
-                data1.dimord            = 'chan_time'; % dimension order for each trial
-                timeVecFound            = rawData(iSub).time; % extract time bin labels
-                if (timeVecFound(end) - timeVecFound(1)) < 10; timeVecFound = timeVecFound * 1000; end % convert from sec to ms
-                data1.time              = repmat({timeVecFound}, 1, nTrialFound); % time bin labels
-                data1.label             = rawData(iSub).chan; % channel labels
-                data1.trial             = squeeze(mat2cell(rawData(iSub).EEGts, sum(indx_chan), nTimeFound, ones(1, nTrialFound)))'; % data
-
-                data1.trialinfo         = rawData(iSub).epoch; % trigger values per trial (as single row, thus transposed)                end
-                % --------------------------------------------------------------- %
-                %% Re-sample to consistent time bins:
-
-                % Limit new time vector to boundaries of data available:
-                fprintf('*** Subject %02d: Resample to new time bins ***\n', iSub);
-                timeVecNew     = timeVec_standard(timeVec_standard >= rawData(iSub).time(1) & timeVec_standard <= rawData(iSub).time(end));
-
-                cfg                     = [];
-                cfg.time                = repmat({timeVecNew}, 1, nTrialFound); % timeVecNew;
-                cfg.demean              = 'no';
-                cfg.detrend             = 'no';
-                data3                   = ft_resampledata(cfg, data1);
-                % data3.time{1}
-
-                % --------------------------------------------------------------- %
-                %% Epoch data to time window of interest:
-
-                fprintf('*** Subject %02d: Select data in time window of %03d - +%03d ms***\n', ...
-                    iSub, timeWindow(1), timeWindow(end));
-                cfg                     = [];
-                cfg.latency             = timeWindow;
-                cfg.avgovertime         = 'no';
-                cfg.nanmean             = 'yes';
-                data4 = []
-                data4                   = ft_selectdata(cfg, data3);
-                %------------------------------------------------------------- %
-                %% add NaN for missing data to keep the same structure across teams
-
-                if rawData(iSub).time(1)>-199 || rawData(iSub).time(end)<599
-                    indx_missing = ismember(timeVec_standard, data4.time{1})
-                    count = find(indx_missing)
-                    nan_start = nan(1,count(1)-1)
-                    nan_end = nan(1,length(timeVec_standard) - count(end))
-
-                    new_time = [nan_start, data4.time{1}, nan_end]
-
-                    for p = 1:length(data4.trial)
-                        data4.time(p) = {timeVec_standard};
-                        nan_start = nan(length(data4.label),count(1)-1);
-                        nan_end = nan(length(data4.label),length(timeVec_standard) - count(end));
-                        data4.trial(p) = {[nan_start, data4.trial{p}, nan_end]}
-                    end
-                end
-                %% Missing channels and channel order
-                [indx_mchan pl_mchan] = ismember(eegChanVec,data4.label);
-
-                chan_full = cell(1,length(eegChanVec));
-                chan_full(indx_mchan)=data4.label(pl_mchan(find(pl_mchan))); % include labels of existing channels
-                for p = 1:length(data4.trial)
-                    copy_data4 = data4;
-                    copy_data4.trial{p} = copy_data4.trial{p}(pl_mchan(find(pl_mchan)),:);%re-order time series data based on a standard channel order
-                    trial_templ = nan(length(eegChanVec),length(data4.time{p}));
-                    trial_templ(indx_mchan,:) = copy_data4.trial{p}; % include re-ordered data and NaN are kept for missing channels
-                    data4.trial(p) = {trial_templ};
-                end
-                data4.label = eegChanVec;
-                % Store time info for a report txt file
-                time =data4.time{1,1};
-                data4.trialinfo   = rawData(iSub).epoch;
-
-                % --------------------------------------------------------------- %
-                subID = str2double(extract(rawData(iSub).subID,digitsPattern));%str2double(cell2mat(extractBetween(rawData(iSub).subID, 5, 6)));
-                fprintf('*** Subject %02d: Save under subject ID %02d ***\n', iSub, subID);
-
-                % Save in cell:
-                alldatstand{1,subID} = data4;
-                alldatstand{2,subID} = ['Subj-',num2str(subID)];
-
-            end % if data is empty
-            fprintf('*** Subject %02d: FINISHED ***\n', iSub);
-            clear data1 data3 data5 data6 data7 timeIdx cfg timeVecNew timeVecFound  nTimeFound nTrialFound
-
-        end % end iSub
-        fprintf('*** TEAM %s: FINISHED  ***\n', teamList{iTeam});
-
-    end
 
     %save
     save([dirs.saveDirstand,'standart_',teamList{iTeam}], 'alldatstand','-v7.3')

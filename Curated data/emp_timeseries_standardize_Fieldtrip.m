@@ -85,9 +85,6 @@ for iTeam = 1:nTeam
 
     alldatstand = cell(1,nSub)
 
-    if endsWith(teamList{iTeam}, '_33.mat')
-        continue
-    end
     % Load data:
     fprintf('*** ========================================================== ***\n');
     fprintf('*** TEAM %s: Start loading data ...  ***\n', teamList{iTeam});
@@ -104,6 +101,7 @@ for iTeam = 1:nTeam
         clear rawData
         continue
     end
+
     % Loop over found subjects:
     for iSub = 1:nSubFound % iSub = 1;
         clear data4
@@ -239,16 +237,6 @@ for iTeam = 1:nTeam
 
     end % end iSub
     fprintf('*** TEAM %s: FINISHED  ***\n', teamList{iTeam});
-
-    %% A special case - when a single team has more than 1 file, skip the
-    % second file
-    if endsWith(teamList{iTeam}, '_27.mat')
-        error('Inspect both files')
-        clear rawData data4
-        rawData         = load(fullfile(dirs.data, [extractBefore(teamList{iTeam}, '_1'),'_28_33.mat']));
-
-        [alldatstand2, alldatavg2] = loop_subj_data4_5(rawData,eegChanVec,timeVec_standard)
-    end
 
     %save
     save([dirs.saveDirstand,'standart_',extractBefore(teamList{iTeam},'_')], 'alldatstand','-v7.3')
