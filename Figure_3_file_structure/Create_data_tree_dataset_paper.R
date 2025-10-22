@@ -1,0 +1,46 @@
+rm(list = ls())
+
+#install.packages("data.tree")
+library(data.tree)
+
+acme <- Node$new("ROOT")
+readme <- acme$AddChild("README")
+  ExpData <- acme$AddChild("Experimental data")
+
+    BIDS <- ExpData$AddChild("eeg_BIDS")
+      s001 <- BIDS$AddChild("sub-001")
+        eeg2 <- s001$AddChild("eeg")
+          t1 <- eeg2$AddChild("Sub-001_task-xxx_channels.tsv")
+          t2 <- eeg2$AddChild("Sub-001_task-xxx_eeg.eeg")
+          t3 <- eeg2$AddChild("Sub-001_task-xxx_eeg.json")
+          t4 <- eeg2$AddChild("Sub-001_task-xxx_eeg.vhdr")
+          t5 <- eeg2$AddChild("Sub-001_task-xxx_eeg.vmrk")
+          t6 <- eeg2$AddChild("Sub-001_task-xxx_events.json")
+          t7 <- eeg2$AddChild("Sub-001_task-xxx_events.tsv")
+      dots <- BIDS$AddChild("...")
+      s033 <- BIDS$AddChild("sub-033")
+      
+    ChanLocs <- ExpData$AddChild("channel_locations")
+      ch1 <- ChanLocs$AddChild("chanlocs_besa.txt")
+      ch2 <- ChanLocs$AddChild("chanlocs_ced.txt")
+    
+    Docu <- ExpData$AddChild("documentation")
+      doc1 <- Docu$AddChild("EMP_dataset_documentation.pdf")
+      doc2 <- Docu$AddChild("EMP_instructions_for_analysts.pdf")
+      doc3 <- Docu$AddChild("TriggerTable.csv")
+  
+  MetaData <- acme$AddChild("Meta-science data")
+      demo <- MetaData$AddChild("Demographics")
+      quest <- MetaData$AddChild("Questionnaires")
+        AQ <- quest$AddChild("Analysis Questionnaires")
+        Ftxt <- quest$AddChild("Free text results")
+        beliefs <- quest$AddChild("Prior and posterior beliefs")
+      pEEG <- MetaData$AddChild("Preprocessed EEG data")
+      script <- MetaData$AddChild("Scripts")
+  StMetaData <- acme$AddChild("Standardized meta-science data")
+    spEEG <- StMetaData$AddChild("Standardized preprocessed EEG data")
+    sresult <- StMetaData$AddChild("Standardized result forms")
+    cAQ <- StMetaData$AddChild("Corrected Analysis questionnaire")
+    
+   
+print(acme)
