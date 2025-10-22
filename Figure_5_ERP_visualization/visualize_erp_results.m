@@ -102,6 +102,8 @@ for i = 1:nconds
 end
 
 set(fighand,'units','normalized','position',[0.1,0.1,0.8,0.8])
+set(fighand,'DefaultAxesFontName','Arial')
+set(fighand,'DefaultTextFontName','Arial')
 
 if ~exist('./figures'), mkdir('./figures'); end
 
